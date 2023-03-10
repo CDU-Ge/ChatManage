@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8">
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="keywords" content="ChatGPT,ChatGPT中文">
+    <meta name="description" content="Description">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.staticfile.org/layui/2.7.6/css/layui.css" rel="stylesheet">
+    <title>ChatGPT</title>
+    <style>
+        /* 设置滚动条的样式 */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        /* 滚动槽 */
+        ::-webkit-scrollbar-track {
+            -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+        }
+
+        /* 滚动条滑块 */
+        ::-webkit-scrollbar-thumb {
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.1);
+            -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5);
+        }
+
+        ::-webkit-scrollbar-thumb:window-inactive {
+            background: rgba(255, 0, 0, 0.4);
+        }
+
+        /* IE 10+ */
+        ::-webkit-scrollbar {
+            display: none; /* Chrome Safari */
+        }
+
+        body {
+            margin: 0;
+            color: white;
+            background-color: rgb(52, 53, 65);
+        }
+
+        .HeaderView {
+            padding: 0 0 0 16px;
+            position: fixed;
+            width: 100vw;
+            height: 70px;
+            font-size: 48px;
+            line-height: 70px;
+            background-color: #202123;
+            z-index: 999;
+        }
+
+        .Content {
+            width: 100vw;
+            height: 100vh;
+            /*background-color: #4ac1f7;*/
+            padding: 16px;
+            box-sizing: border-box;
+        }
+
+        .Tips {
+            background-color: #5E5694;
+            width: 100%;
+            min-height: 50px;
+            padding: 16px;
+            box-sizing: border-box;
+            border-radius: 8px;
+        }
+
+        .Options {
+            border: 1px solid black;
+            border-radius: 16px;
+            background-color: #202123;
+            width: 100%;
+            max-width: 512px;
+            /*min-height: 50px;*/
+            padding: 16px;
+            margin: 16px 0;
+            box-sizing: border-box;
+        }
+
+        .Conversation {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 0 0 120px 0;
+        }
+
+        .Bot {
+            background-color: #343541;
+        }
+
+        .Human {
+            background-color: #434654;
+        }
+
+        .Message {
+            width: 100%;
+            min-height: 32px;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid black;
+            font-size: 16px;
+        }
+
+        .UserInput {
+            position: fixed;
+            margin: 8px;
+            padding: 16px;
+            bottom: 16px;
+            width: calc(100% - 16px);
+            border-radius: 16px;
+            box-sizing: border-box;
+            height: 70px;
+            background-color: #202123;
+            box-shadow: 0 20px 20px 20px black;
+        }
+
+        .cdu-bg-black {
+            color: white;
+            background-color: black;
+        }
+
+        .cdu-bg-black > .layui-layer-content {
+            background-color: black;
+        }
+
+        .cdu-bg-black > .layui-card-header {
+            color: white;
+            background-color: #343541;
+        }
+
+        .cdu-bg-black > .layui-card-body {
+            background-color: #434654;
+        }
+    </style>
+</head>
+<body>
+<div class="">
+    <div class="HeaderView">ChatGPT<button class="layui-btn" style="right: 32px;top: 16px; position: absolute;"><a href="{% url 'chat:g_logout' %}">退出</a></button></div>
+    <div class="Content">
+        <div style="height: 70px"></div>
+        <div class="Tips">Tips: 单日不限次数提问，可自行替换API接口。</div>
+        <div class="Options">
+            <form class="layui-form" action="">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">生成模型</label>
+                    <div class="layui-input-block">
+                        <label>
+                            <select id="modelSelect">
+                                <option value="0">默认</option>
+                                <option value="1"></option>
+                            </select>
+                        </label>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">API KEY</label>
+                    <div class="layui-input-block">
+                        <label>
+                            <input name="apiKey" placeholder="输入你的APIKey" class="layui-input">
+                        </label>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="Conversation">
+            <ul></ul>
+        </div>
+    </div>
+    <div class="UserInput layui-inline">
+        <div class="layui-row">
+            <div class="layui-col-md10 layui-col-xs9">
+                <input id="questionInput" type="text" class="layui-input" placeholder="请输入..." lay-verify="required">
+            </div>
+            <div class="layui-col-md2 layui-col-xs3" style="display: flex">
+                <button id="sendButton" type="button" class="layui-btn" style="margin: auto">点击</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.staticfile.org/layui/2.7.6/layui.js"></script>
+<script id="MessageBox" type="text/html">
+    <div class="layui-card cdu-bg-black">
+        <div class="layui-card-header"></div>
+        <div class="layui-card-body" style="word-wrap: break-word;word-break: break-word;overflow: hidden;"></div>
+    </div>
+</script>
+<script type="text/javascript">
+    layui.use([], function () {
+        const $ = layui.jquery;
+        const form = layui.form;
+        const layer = layui.layer;
+        var loading = null;
+
+        function closeLoading() {
+            console.log('loading: ', loading)
+            if (loading !== null) {
+                layer.close(loading);
+                try {
+                    console.log('close loading...');
+                } catch (e) {
+                    console.error(e);
+                }
+            }
+            loading = null;
+        }
+
+        function addMessage(questionStr) {
+            closeLoading();
+            const conversation = $(".Conversation > ul")
+            const li = $("<li></li>");
+            const messageBox = $($("#MessageBox").html());
+            const question = messageBox.find(".layui-card-header");
+            const answer = messageBox.find('.layui-card-body');
+            let history_q = [];
+            $("ul .layui-card-header").each((i) => {
+                history_q.push($($("ul .layui-card-header")[i]).html())
+            })
+            let history_a = [];
+            $("ul .layui-card-body").each((i) => {
+                history_a.push($($("ul .layui-card-body")[i]).html());
+            })
+            let ql = [];
+            const notInclude = ['拒绝访问', '正在申请使用中，请等待', '请求异常！', '网络异常'];
+            for (let i = 0; i < history_q.length; i++) {
+                if (notInclude.indexOf(history_a[i]) === -1) {
+                    ql.push(history_q[i])
+                    ql.push(history_a[i])
+                }
+            }
+            ql.push(questionStr)
+            let xhr = new XMLHttpRequest();
+            xhr.open('POST', '/api/v0/chat/', true);
+            xhr.setRequestHeader("X-CSRFToken", "{{csrf_token}}")
+            xhr.onreadystatechange = function () {
+                if (xhr.status === 200) {
+                    answer.html(xhr.responseText);
+                } else {
+                    console.log(xhr.responseText)
+                    if (!answer.html()) {
+                        answer.html("网络异常");
+                    }
+                }
+            }
+            xhr.send(JSON.stringify({
+                question: ql,
+                model: $("#modelSelect").val(),
+                apiKey: $("input[name=apiKey]").val()
+            }));
+            console.log(xhr);
+            question.html(questionStr);
+            li.append(messageBox);
+            console.log(li);
+            conversation.append(li);
+        }
+
+        function sendMessage(question) {
+            console.log(question);
+            if (!question || question === '') {
+                closeLoading();
+                layer.msg("请输入问题！", {icon: 2, skin: "cdu-bg-black"});
+
+            } else {
+                addMessage(question);
+            }
+
+        }
+
+        $("#sendButton").click(function () {
+            console.log("send message");
+            loading = layer.load(0, {shade: false});
+            const questionStr = $("#questionInput").val();
+            sendMessage(questionStr);
+        })
+    })
+</script>
+</body>
+</html>

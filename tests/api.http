@@ -1,0 +1,4 @@
+GET http://localhost:8000/api/v0/chat
+Accept: application/octet-stream
+
+###

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="keywords" content="ChatGPT,ChatGPT中文">
+    <meta name="description" content="Description">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatGPT</title>
+    <link href="https://cdn.staticfile.org/layui/2.7.6/css/layui.css" rel="stylesheet">
+    <!--[if lt IE 9]>
+    <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+    <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <style>
+        body {
+            display: flex;
+            background-color: #4ac1f7;
+            min-height: 100vh;
+        }
+
+        .userForm {
+            background-color: #5b80b2;
+            padding: 16px;
+            box-sizing: border-box;
+            border-radius: 16px;
+            min-width: 256px;
+        }
+    </style>
+</head>
+<body>
+<div class="userForm" style="margin: auto">
+    <form class="layui-form" action="" onsubmit="return false">
+        <div class="layui-form-item">
+            <label class="layui-form-label">账号</label>
+            <div class="layui-input-block">
+                <input type="text" name="username" required lay-verify="required" placeholder="请输入输入框内容"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">密码框</label>
+            <div class="layui-input-block">
+                <input type="password" name="passwd" required lay-verify="required" placeholder="请输入密码框内容"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="formLogin">登录</button>
+                <button type="button" class="layui-btn"><a href="/accounts/register/">注册</a></button>
+            </div>
+        </div>
+    </form>
+</div>
+<script src="https://cdn.staticfile.org/layui/2.7.6/layui.js"></script>
+<script>
+    let loading = null;
+    layui.use('form', function () {
+        const form = layui.form;
+        const $ = layui.jquery;
+        const layer = layui.layer;
+        form.on('submit(formLogin)', function (data) {
+            console.log(data);
+            $.ajaxSetup({
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("X-CSRFToken", "{{csrf_token}}")
+                }
+            })
+            $.ajax({
+                url: "{% url 'chat:g_login' %}",
+                method: 'POST',
+                dataType: 'json',
+                data: JSON.stringify(data.field),
+                success: function (data) {
+                    console.log(data);
+                    layer.msg(data.message)
+                    if (data.code === 0) {
+                        window.location.href = `${data.to}`;
+                    }
+                },
+                error: function (e) {
+                    console.log(e);
+                }
+            })
+        });
+    });
+
+</script>
+</body>
+</html>
