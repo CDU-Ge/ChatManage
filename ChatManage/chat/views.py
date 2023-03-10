@@ -31,9 +31,8 @@ def api_v0_chat(request: HttpRequest) -> t.Union[StreamingHttpResponse]:
     if not profile_user.is_vip:
         return StreamingHttpResponse("正在申请使用中，请等待")
     body = json.loads(request.body)
-    api_key = body.get('apiKey')
-    if api_key == '':
-        api_key = None
+    # 从数据库获得API密钥
+    api_key = None
     api_key_obj = None
     if api_key is None:
         api_key_obj = ApiKey.objects.filter(is_work=False, is_valid=True).first()
