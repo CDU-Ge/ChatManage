@@ -13,6 +13,7 @@ class ChatUser(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     is_vip = models.BooleanField(default=False, verbose_name="是否可以使用API接口")
     use_count = models.BigIntegerField(default=0, verbose_name="总计调用次数")
+    balance = models.BigIntegerField(default=0, verbose_name="剩余调用次数")
 
     def __repr__(self):
         return f"<{self.user} api: {self.is_vip}>"

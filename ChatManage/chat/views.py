@@ -30,6 +30,8 @@ def api_v0_chat(request: HttpRequest) -> t.Union[StreamingHttpResponse]:
         return StreamingHttpResponse("拒绝访问")
     if not profile_user.is_vip:
         return StreamingHttpResponse("正在申请使用中，请等待")
+    if profile_user.balance <= 0:
+        return StreamingHttpResponse("余额不足")
     body = json.loads(request.body)
     # 从数据库获得API密钥
     api_key = None
@@ -46,6 +48,8 @@ def api_v0_chat(request: HttpRequest) -> t.Union[StreamingHttpResponse]:
     if not isinstance(question_list, list) and not question_list:
         return StreamingHttpResponse("请求异常!")
     try:
+        if api_key_obj: # 调用次数+1 用户调用次数+1 用户可用次数-1
+            pass
         return StreamingHttpResponse(question(question_list, api_key))
     finally:
         if api_key_obj:
