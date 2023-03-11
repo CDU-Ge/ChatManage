@@ -52,6 +52,11 @@ def api_v0_chat(request: HttpRequest) -> t.Union[StreamingHttpResponse]:
             profile_user.balance -= 1
             profile_user.use_count += 1
             api_key_obj.call_count += 1
+            try:
+                profile_user.save()
+                api_key_obj.save()
+            except Exception as e:
+                logger.warning(e)
         return StreamingHttpResponse(question(question_list, api_key))
     finally:
         if api_key_obj:

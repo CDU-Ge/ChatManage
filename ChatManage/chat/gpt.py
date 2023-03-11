@@ -50,6 +50,11 @@ def question(qs: t.List[str], api_key: str) -> t.Generator[str]:
             key.is_valid = False
             key.save()
         yield "服务异常！"
+    finally:
+        with transaction.atomic():
+            key = ApiKey.objects.filter(value=api_key).first()
+            key.is_work = False
+            key.save()
 
 
 if __name__ == '__main__':
