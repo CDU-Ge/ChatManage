@@ -24,7 +24,7 @@ class UserAdmin(BaseUserAdmin):
 
 
 class ChatAdmin(admin.ModelAdmin):
-    list_display = ('user', 'is_vip')
+    list_display = ('user', 'is_vip', 'balance')
     actions = [
         'make_chat_user_can_use_api',
         'make_chat_user_not_use_api'

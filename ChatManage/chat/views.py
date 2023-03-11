@@ -49,7 +49,9 @@ def api_v0_chat(request: HttpRequest) -> t.Union[StreamingHttpResponse]:
         return StreamingHttpResponse("请求异常!")
     try:
         if api_key_obj: # 调用次数+1 用户调用次数+1 用户可用次数-1
-            pass
+            profile_user.balance -= 1
+            profile_user.use_count += 1
+            api_key_obj.call_count += 1
         return StreamingHttpResponse(question(question_list, api_key))
     finally:
         if api_key_obj:
