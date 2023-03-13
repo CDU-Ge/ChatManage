@@ -40,7 +40,7 @@ class ChatAdmin(admin.ModelAdmin):
 
 
 class ApiKeyAdmin(admin.ModelAdmin):
-    list_display = ('value', 'call_count', 'is_valid')
+    list_display = ('value', 'call_count', 'is_valid', 'balance')
     list_editable = ('is_valid',)
 
 
