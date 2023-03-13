@@ -1,12 +1,26 @@
-from django.apps import apps
-from django.contrib.auth.hashers import make_password
-from django.db import models
+import logging
+
+import requests
+from django.contrib import admin
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.contrib.auth.models import User
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
-from django.db.models import Manager
+from django.db import models
 
 
 # Create your models here.
+
+def get_balance(key):
+    proxies = {}
+    base_url = "https://api.openai.com/dashboard/billing/credit_grants"
+    try:
+        resp = requests.get(base_url, headers={
+            'Content-Type': "application/json",
+            'Authorization': f"Bearer {key}"
+        }, proxies=proxies, timeout=3).json()
+    except Exception as e:
+        logging.error(e)
+        resp = {}
+    return resp.get('total_available', -1)
 
 
 class ChatUser(models.Model):
@@ -37,3 +51,10 @@ class ApiKey(models.Model):
 
     def __str__(self):
         return f"{self.value}"
+
+    @admin.display(ordering='balance', description="余额")
+    def balance(self):
+        if self.is_valid:
+            return get_balance(self.value)
+        else:
+            return -1
