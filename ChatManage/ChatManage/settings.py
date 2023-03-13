@@ -152,4 +152,4 @@ LOGGING = {
     }
 }
 
-CSRF_TRUSTED_ORIGINS = ['https://48ie131721.yicp.fun']
+CSRF_TRUSTED_ORIGINS = ["*"]
