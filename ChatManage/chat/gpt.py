@@ -36,6 +36,7 @@ def question(qs: t.List[str], api_key: str) -> t.Generator[str]:
     # openai = importlib.import_module('openai')
     import openai
     openai.api_key = api_key
+    openai.proxy = "http://127.0.0.1:10809"
     try:
         completion = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",

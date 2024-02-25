@@ -37,14 +37,14 @@ def api_v0_chat(request: HttpRequest) -> t.Union[StreamingHttpResponse]:
     api_key = None
     api_key_obj = None
     if api_key is None:
-        api_key_obj = ApiKey.objects.filter(is_work=False, is_valid=True).first()
+        api_key_obj = ApiKey.objects.filter(is_valid=True).first()
         if api_key_obj is None:
             return StreamingHttpResponse("服务异常！")
         api_key_obj.is_work = True
         api_key = api_key_obj.value
     if api_key is None:
         return StreamingHttpResponse("服务异常！")
-    question_list = body.get('question') or []
+    question_list = body.get('qu estion') or []
     if not isinstance(question_list, list) and not question_list:
         return StreamingHttpResponse("请求异常!")
     try:

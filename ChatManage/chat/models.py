@@ -10,7 +10,10 @@ from django.db import models
 # Create your models here.
 
 def get_balance(key):
-    proxies = {}
+    return -1
+    proxies = {
+        "https://": ""
+    }
     base_url = "https://api.openai.com/dashboard/billing/credit_grants"
     try:
         resp = requests.get(base_url, headers={
